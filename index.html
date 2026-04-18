@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MusicEVE - Giai Điệu Của Riêng Bạn</title>
+    <meta name="description" content="Trải nghiệm nghe nhạc trực tuyến chất lượng cao, tối giản và hiện đại. Khám phá những giai điệu của riêng bạn tại MusicEVE." />
+    <meta name="keywords" content="music, streaming, nghe nhạc, giải trí, MusicEVE, âm nhạc Việt" />
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#1ed760">
+    <link rel="apple-touch-icon" href="/logo.png">
+
+    <!-- OpenGraph -->
+    <meta property="og:title" content="MusicEVE - Giai Điệu Của Riêng Bạn" />
+    <meta property="og:description" content="Nền tảng streaming âm nhạc tối giản và hiện đại cho thế hệ mới." />
+    <meta property="og:image" content="/logo.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://musiceve.vercel.app" />
+
+    <!-- Google Fonts: Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-black text-white">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(err => {
+            console.error('ServiceWorker registration failed: ', err);
+          });
+        });
+      }
+    </script>
+  </body>
+</html>
