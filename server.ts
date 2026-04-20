@@ -19,6 +19,7 @@ import userRoutes from "./src/backend/routes/user.js";
 import adminRoutes from "./src/backend/routes/admin.js";
 import streamRoutes from "./src/backend/routes/stream.js";
 import homeRoutes from "./src/backend/routes/home.js";
+import artistRoutes from "./src/backend/routes/artist.js";
 
 // Init DB
 import { initDb } from "./src/backend/db/index.js";
@@ -52,16 +53,17 @@ export async function createApp() {
   }
 
   // ── API Routes (MUST be before Vite catch-all) ──────────────────
-  app.use("/api/auth",     authRoutes);
-  app.use("/api/tracks",   trackRoutes);
-  app.use("/api/playlists",playlistRoutes);
-  app.use("/api/search",   searchRoutes);
-  app.use("/api/likes",    likeRoutes);
+  app.use("/api/auth", authRoutes);
+  app.use("/api/tracks", trackRoutes);
+  app.use("/api/playlists", playlistRoutes);
+  app.use("/api/search", searchRoutes);
+  app.use("/api/likes", likeRoutes);
   app.use("/api/comments", commentRoutes);
-  app.use("/api/users",    userRoutes);
-  app.use("/api/admin",    adminRoutes);
-  app.use("/api/stream",   streamRoutes);
-  app.use("/api/home",     homeRoutes);
+  app.use("/api/users", userRoutes);
+  app.use("/api/admin", adminRoutes);
+  app.use("/api/stream", streamRoutes);
+  app.use("/api/home", homeRoutes);
+  app.use("/api/artists", artistRoutes);
 
   // ── Global Error Handler ─────────────────────────────────────────
   app.use((err: any, req: Request, res: Response, next: NextFunction) => {
@@ -108,7 +110,7 @@ export async function createApp() {
 if (process.env.NODE_ENV !== "production") {
   createApp().then(() => {
     app.listen(PORT, "0.0.0.0", () => {
-      console.log(`✅ Server running on http://localhost:${PORT}`);
+      console.log(` Server running on http://localhost:${PORT}`);
     });
   });
 }

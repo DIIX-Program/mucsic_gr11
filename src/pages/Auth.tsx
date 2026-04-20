@@ -39,7 +39,7 @@ export function Auth() {
 
       const data = await res.json();
       if (res.ok) {
-        setAuth(data.user.id, data.user.isAdmin || false);
+        setAuth(data.user.id, data.user.isAdmin || false, data.user.isArtist || false);
         navigate("/");
       } else {
         setError(data.error || "Xác thực thất bại");

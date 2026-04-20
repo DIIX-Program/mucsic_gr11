@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { trackController } from "../controllers/trackController.js";
-import { authenticate, optionalAuthenticate } from "../middleware/auth.js";
+import { authenticate, optionalAuthenticate, requireRole } from "../middleware/auth.js";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -49,7 +49,7 @@ router.get("/search", trackController.search);
 router.get("/:id", trackController.getById);
 router.post("/ai-generate-description", authenticate, trackController.generateDescription);
 router.post("/:id/play", optionalAuthenticate, trackController.recordPlay);
-router.post("/", authenticate, upload.fields([{ name: "audio", maxCount: 1 }, { name: "cover_image", maxCount: 1 }]), trackController.upload);
+router.post("/", authenticate, requireRole('ARTIST'), upload.fields([{ name: "audio", maxCount: 1 }, { name: "cover_image", maxCount: 1 }]), trackController.upload);
 router.delete("/:id", authenticate, trackController.delete);
 
 export default router;

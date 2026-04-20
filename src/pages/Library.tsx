@@ -124,7 +124,7 @@ export function Library() {
       });
       const json = await res.json();
       if (res.ok) {
-        addToast("Đã tạo danh sách phát 💿", "success");
+        addToast("Đã tạo danh sách phát ", "success");
         // Optimistic update
         addPlaylist({
           id: json.data.id,

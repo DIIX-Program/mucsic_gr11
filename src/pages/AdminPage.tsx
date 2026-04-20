@@ -8,7 +8,7 @@ import { useAdmin } from '../hooks/useAdmin';
 import { motion, AnimatePresence } from 'motion/react';
 import clsx from 'clsx';
 
-type Tab = 'stats' | 'tracks' | 'comments' | 'users';
+type Tab = 'stats' | 'tracks' | 'comments' | 'users' | 'artists';
 
 // ── Skeleton ────────────────────────────────────────────────────────────────
 const Sk = ({ className }: { className?: string; key?: React.Key }) => (
@@ -30,23 +30,27 @@ const AdminPage: React.FC = () => {
   const [search, setSearch] = useState('');
   const {
     usePendingTracks, useRecentComments, useUsers, useStats,
-    useModerateTrack, useModerateComment, useManageUser
+    useModerateTrack, useModerateComment, useManageUser,
+    useArtistRequests, useModerateArtist
   } = useAdmin();
 
   const { data: stats,    isLoading: sLoading,  refetch: rStats   } = useStats();
   const { data: tracks,   isLoading: tLoading,  refetch: rTracks  } = usePendingTracks();
   const { data: comments, isLoading: cLoading,  refetch: rComments } = useRecentComments();
   const { data: users,    isLoading: uLoading,  refetch: rUsers   } = useUsers(1, search);
+  const { data: artists,  isLoading: arLoading, refetch: rArtists } = useArtistRequests();
 
   const moderateTrack   = useModerateTrack();
   const moderateComment = useModerateComment();
   const manageUser      = useManageUser();
+  const moderateArtist  = useModerateArtist();
 
-  const refetch = () => { rStats(); rTracks(); rComments(); rUsers(); };
+  const refetch = () => { rStats(); rTracks(); rComments(); rUsers(); rArtists(); };
 
   const tabs: { id: Tab; label: string; icon: any; badge?: number }[] = [
     { id: 'stats',    label: 'Tổng quan',        icon: BarChart3,     },
     { id: 'tracks',   label: 'Duyệt nhạc',       icon: Music,         badge: tracks?.length   },
+    { id: 'artists',  label: 'Nghệ sĩ',          icon: ShieldCheck,   badge: artists?.length  },
     { id: 'comments', label: 'Bình luận',         icon: MessageSquare, },
     { id: 'users',    label: 'Người dùng',        icon: Users,         },
   ];
@@ -289,6 +293,43 @@ const AdminPage: React.FC = () => {
                         title="Xóa"
                       >
                         <Trash2 size={13} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </motion.div>
+        )}
+        {/* ARTISTS */}
+        {activeTab === 'artists' && (
+          <motion.div key="artists" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+             {arLoading ? (
+              <div className="space-y-3">{Array.from({length:3}).map((_,i)=><Sk key={i} className="h-24"/>)}</div>
+            ) : !artists?.length ? (
+              <Empty icon={ShieldCheck} t="Không có yêu cầu làm nghệ sĩ" d="Tất cả hồ sơ đã được xử lý." />
+            ) : (
+              <div className="space-y-3">
+                {artists.map((art: any) => (
+                  <div key={art.id} className="flex items-center gap-4 bg-zinc-900/60 p-5 rounded-2xl border border-white/5">
+                    <img src={art.avatar_url || `https://picsum.photos/seed/${art.id}/100/100`} className="w-16 h-16 rounded-2xl object-cover shrink-0" alt="" />
+                    <div className="flex-1 min-w-0">
+                       <p className="font-black text-white text-lg">{art.artist_name}</p>
+                       <p className="text-sm text-zinc-500 mb-2">Username: {art.username}</p>
+                       <p className="text-xs text-zinc-400 italic line-clamp-2">"{art.bio || 'Không có tiểu sử'}"</p>
+                    </div>
+                    <div className="flex flex-col gap-2 shrink-0">
+                      <button
+                        onClick={() => moderateArtist.mutate({ id: art.id, action: 'approve' })}
+                        className="bg-[#1ed760] text-black px-6 py-2.5 rounded-xl font-black text-xs hover:scale-105 transition"
+                      >
+                        PHÊ DUYỆT
+                      </button>
+                      <button
+                        onClick={() => moderateArtist.mutate({ id: art.id, action: 'reject' })}
+                        className="bg-red-500/10 text-red-500 border border-red-500/20 px-6 py-2.5 rounded-xl font-black text-xs hover:bg-red-500/20 transition"
+                      >
+                        TỪ CHỐI
                       </button>
                     </div>
                   </div>

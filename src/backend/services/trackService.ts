@@ -42,6 +42,7 @@ export const trackService = {
     visibility?: string;
     releaseDate?: string;
     album?: string;
+    artist_id?: string;
     file_path: string;
     cover_image_path?: string;
   }) => {

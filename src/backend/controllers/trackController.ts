@@ -1,5 +1,6 @@
 import { Response, NextFunction } from "express";
 import { trackService } from "../services/trackService.js";
+import { artistRepository } from "../repositories/artistRepository.js";
 import { AuthRequest } from "../middleware/auth.js";
 
 export const trackController = {
@@ -21,6 +22,10 @@ export const trackController = {
         return res.status(400).json({ success: false, error: "Audio file is required" });
       }
 
+      // Check artist_id
+      const artist = await artistRepository.findByUserId(userId);
+      const artistId = artist?.status === 'APPROVED' ? artist.id : undefined;
+
       const track = await trackService.uploadTrack({
         uploader_user_id: userId,
         title,
@@ -30,6 +35,7 @@ export const trackController = {
         visibility,
         releaseDate,
         album,
+        artist_id: artistId,
         file_path: `/uploads/audio/${audioFile.filename}`,
         cover_image_path: coverImageFile ? `/uploads/images/${coverImageFile.filename}` : undefined
       });

@@ -80,6 +80,7 @@ export const trackRepository = {
     description?: string;
     visibility?: string;
     releaseDate?: string;
+    artist_id?: string;
   }): Promise<void> => {
     const pool = await getConnection();
     const tx = new mssql.Transaction(pool);
@@ -136,6 +137,7 @@ export const trackRepository = {
       await new mssql.Request(tx)
         .input('id',         mssql.VarChar,  track.id)
         .input('uploader',   mssql.VarChar,  track.uploader_user_id)
+        .input('artistId',   mssql.VarChar,  track.artist_id || null)
         .input('title',      mssql.NVarChar, track.title)
         .input('slug',       mssql.VarChar,  track.id)
         .input('artist',     mssql.NVarChar, track.main_artist)
@@ -148,10 +150,10 @@ export const trackRepository = {
         .input('release',    mssql.Date,     track.releaseDate || null)
         .query(`
           INSERT INTO tracks
-            (id, uploader_user_id, title, slug, main_artist, audio_object_id,
+            (id, uploader_user_id, artist_id, title, slug, main_artist, audio_object_id,
              cover_image_object_id, visibility, status, description, genre_id, release_date)
           VALUES
-            (@id, @uploader, @title, @slug, @artist, @audioId,
+            (@id, @uploader, @artistId, @title, @slug, @artist, @audioId,
              @coverId, @visibility, @status, @desc, @genreId, @release)
         `);
 

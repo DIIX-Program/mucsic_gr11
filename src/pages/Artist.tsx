@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { usePlayerStore, Track } from "../store/playerStore";
 import { Play, Heart, Users, MessageCircle, MoreHorizontal, CheckCircle2, Star, Share2 } from "lucide-react";
+import { CommentInput } from "../components/CommentInput";
 import { useToastStore } from "../store/toastStore";
 import { useAuthStore } from "../store/authStore";
 import { motion, AnimatePresence } from "motion/react";
@@ -9,7 +10,7 @@ import clsx from "clsx";
 
 interface Artist {
   id: string;
-  display_name: string;
+  artist_name: string;
   bio: string;
   avatar_url: string;
   banner_url: string;
@@ -29,7 +30,7 @@ export function Artist() {
   const { userId } = useAuthStore();
 
   useEffect(() => {
-    fetch(`/api/users/${id}`)
+    fetch(`/api/artists/${id}`)
       .then(res => res.json())
       .then(data => {
         if (data.success) {
@@ -44,7 +45,7 @@ export function Artist() {
     if (artist?.tracks.length) {
       setQueue(artist.tracks, 0);
       setPlaying(true);
-      addToast(`Đang phát tất cả bài hát của ${artist.display_name}`, "success");
+      addToast(`Đang phát tất cả bài hát của ${artist.artist_name}`, "success");
     }
   };
 
@@ -64,7 +65,7 @@ export function Artist() {
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          addToast(`Đã theo dõi ${artist?.display_name}`, "success");
+          addToast(`Đã theo dõi ${artist?.artist_name}`, "success");
           setArtist(prev => prev ? { ...prev, followers_count: prev.followers_count + 1 } : null);
         }
       });
@@ -116,7 +117,7 @@ export function Artist() {
             transition={{ delay: 0.1 }}
             className="text-9xl font-black tracking-tighter text-white leading-none drop-shadow-2xl"
           >
-            {artist.display_name}
+            {artist.artist_name}
           </motion.h1>
           <motion.div 
             initial={{ opacity: 0 }}
@@ -227,6 +228,18 @@ export function Artist() {
                   <MessageCircle size={18} />
                </div>
              </div>
+
+             {userId && artist.tracks.length > 0 && (
+               <div className="mb-8">
+                 <CommentInput 
+                   trackId={artist.tracks[0].id} 
+                   onCommentAdded={(newComment) => {
+                     setArtist(prev => prev ? { ...prev, comments: [newComment, ...(prev.comments || [])] } : null);
+                   }} 
+                 />
+               </div>
+             )}
+
              <div className="space-y-4">
                {artist.comments && artist.comments.length > 0 ? artist.comments.map((comment) => (
                  <motion.div 

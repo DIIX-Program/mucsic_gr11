@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { UploadCloud, CheckCircle2, Globe, Lock, Clock, Info, Image as ImageIcon, Loader2, Music, Youtube, Play, X, FileAudio, Sparkles } from "lucide-react";
 import { useToastStore } from "../store/toastStore";
+import { useAuthStore } from "../store/authStore";
 import { motion, AnimatePresence } from "motion/react";
 import clsx from "clsx";
 
@@ -27,6 +28,62 @@ export function Upload() {
   const artworkInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { addToast } = useToastStore();
+  const { userId, isArtist } = useAuthStore();
+  const [requestSent, setRequestSent] = useState(false);
+
+  const handleArtistRequest = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/artists/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ artist_name: "Tên Nghệ Sĩ Mới" }), 
+      });
+      const data = await res.json();
+      if (data.success) {
+        addToast("Yêu cầu trở thành nghệ sĩ đã được gửi!", "success");
+        setRequestSent(true);
+      } else {
+        addToast(data.error || "Không thể gửi yêu cầu", "error");
+      }
+    } catch {
+      addToast("Lỗi kết nối", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!isArtist) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[70vh] p-8 text-center max-w-2xl mx-auto gap-8">
+        <div className="w-24 h-24 bg-zinc-900 rounded-[32px] flex items-center justify-center border border-white/5 shadow-2xl">
+           <Music size={48} className="text-zinc-700" />
+        </div>
+        <div className="space-y-4">
+          <h2 className="text-4xl font-black text-white tracking-tighter">Bạn chưa phải là Nghệ sĩ</h2>
+          <p className="text-zinc-500 font-bold text-lg leading-relaxed">
+            Chỉ những nghệ sĩ đã được xác minh mới có thể phát hành âm nhạc trên nền tảng. 
+            Hãy gửi yêu cầu và bắt đầu hành trình âm nhạc của bạn!
+          </p>
+        </div>
+        
+        {requestSent ? (
+          <div className="bg-[#1ed760]/10 border border-[#1ed760]/20 p-6 rounded-3xl flex items-center gap-4 text-[#1ed760]">
+             <CheckCircle2 size={24} />
+             <span className="font-black uppercase tracking-widest text-sm">Yêu cầu của bạn đang chờ phê duyệt</span>
+          </div>
+        ) : (
+          <button 
+            onClick={handleArtistRequest}
+            disabled={loading}
+            className="bg-[#1ed760] text-black font-black py-4 px-12 rounded-full hover:scale-105 active:scale-95 transition-all shadow-[0_20px_40px_rgba(30,215,96,0.3)] disabled:opacity-50"
+          >
+            {loading ? <Loader2 size={24} className="animate-spin" /> : "GỬI YÊU CẦU TRỞ THÀNH NGHỆ SĨ"}
+          </button>
+        )}
+      </div>
+    );
+  }
 
   const handleFileDrop = (e: React.DragEvent) => {
     e.preventDefault();

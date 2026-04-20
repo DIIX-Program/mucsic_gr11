@@ -27,7 +27,7 @@ export const authController = {
       res.status(201).json({
         success: true,
         message: "Registered successfully",
-        user: { id: user.id, username: user.username, email: user.email, isAdmin: user.isAdmin }
+        user: { id: user.id, username: user.username, email: user.email, isAdmin: user.isAdmin, isArtist: false }
       });
     } catch (error: any) {
       if (error.message?.includes("already registered") || error.message?.includes("Violation of UNIQUE")) {
@@ -58,7 +58,13 @@ export const authController = {
       res.status(200).json({
         success: true,
         message: "Logged in successfully",
-        user: { id: user.id, username: user.username, email: user.email, isAdmin: user.isAdmin }
+        user: { 
+          id: user.id, 
+          username: user.username, 
+          email: user.email, 
+          isAdmin: user.isAdmin,
+          isArtist: await userRepository.isArtist(user.id)
+        }
       });
     } catch (error: any) {
       if (error.message === "Invalid credentials") {
@@ -87,7 +93,8 @@ export const authController = {
       res.status(200).json({
         success: true,
         userId: decoded.userId,
-        isAdmin
+        isAdmin,
+        isArtist: await userRepository.isArtist(decoded.userId)
       });
     } catch {
       res.status(401).json({ success: false, error: "Invalid token" });

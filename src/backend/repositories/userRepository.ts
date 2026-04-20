@@ -205,6 +205,26 @@ export const userRepository = {
   },
 
   // ──────────────────────────────────────────
+  // IS ARTIST
+  // ──────────────────────────────────────────
+  isArtist: async (userId: string): Promise<boolean> => {
+    try {
+      const pool = await getConnection();
+      const result = await pool
+        .request()
+        .input("userId", mssql.VarChar, userId)
+        .query(`
+          SELECT 1 FROM user_roles ur
+          JOIN app_roles ar ON ur.role_id = ar.id
+          WHERE ur.user_id = @userId AND ar.name = 'ARTIST'
+        `);
+      return result.recordset.length > 0;
+    } catch {
+      return false;
+    }
+  },
+
+  // ──────────────────────────────────────────
   // IS ADMIN
   // ──────────────────────────────────────────
   isAdmin: async (userId: string): Promise<boolean> => {

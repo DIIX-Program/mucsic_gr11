@@ -55,8 +55,24 @@ export const useAdmin = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
   });
 
+  const useArtistRequests = () => useQuery({
+    queryKey: ['admin', 'artists', 'requests'],
+    queryFn: () => api('/artists/requests')
+  });
+
+  const useModerateArtist = () => useMutation({
+    mutationFn: ({ id, action, verified }: { id: string; action: 'approve' | 'reject' | 'demote'; verified?: boolean }) =>
+      api(`/artists/${id}/${action}`, { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ verified })
+      }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'artists'] })
+  });
+
   return {
     usePendingTracks, useRecentComments, useUsers, useStats,
-    useModerateTrack, useModerateComment, useManageUser
+    useModerateTrack, useModerateComment, useManageUser,
+    useArtistRequests, useModerateArtist
   };
 };
